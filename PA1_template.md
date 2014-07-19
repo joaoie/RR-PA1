@@ -1,0 +1,71 @@
+---
+title: "Reproducible Research Assigment 1"
+author: "joaoie"
+date: "July 18, 2014"
+output: html_document
+---
+#  
+# Assignment 1 for Reproducible Research Course  
+
+This is the Assignment 1 for the Reproducible Research assignment 1 written as a R Markdown document.
+
+
+## First step is to load the data.
+
+1- "activity.csv" is read (from the working directory) into the dataframe "data"  
+2- then the date format is corrected.  
+
+
+```r
+data<-read.csv("activity.csv")
+data$date<-as.Date(data$date,"%Y-%m-%d")
+```
+
+## Second step is to determine mean total number of steps taken per day
+
+1- The number of steps per day is determined: the aggregate function aggregates  
+the dataframe based on same days, and sums the steps per day.  
+The *"interval"* column is then dropped:  
+
+
+```r
+daysteps<-aggregate(. ~ date, data=data, FUN=sum)
+daysteps$interval<-NULL
+```
+
+2- Create a Histogram of the total number of steps taken each day:  
+ 
+
+
+```r
+ggplot(daysteps, aes(steps)) + geom_histogram(binwidth = 1000, colour="white")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
+3- And calculate the **mean** and **median** total number of steps per day   
+
+
+```r
+mean<-mean(daysteps$steps)
+median<-median(daysteps$steps)
+```
+The mean is 1.0766 &times; 10<sup>4</sup>, and the median is 10765.  
+
+## Third step is to determine the average daily activity pattern  
+
+1- The number of steps per 5-minute interval is determined by the aggregate  
+function that aggregates the dataframe based on same 5-minute intervals,  
+and averages the number of steps per 5-minute interval.   
+The *"interval"* column is then dropped:
+
+
+```r
+x<-data
+x$date<-NULL
+x<-aggregate(. ~ interval, data=x, FUN=sum)
+x$steps<-x$steps/288
+plot(x$interval,x$steps, type="l",xlab="5-minute interval of the day",ylab="Average Steps")
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
