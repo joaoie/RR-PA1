@@ -56,7 +56,7 @@ The mean is 1.0766 &times; 10<sup>4</sup>, and the median is 10765.
 1- The number of steps per 5-minute interval is determined by the aggregate  
 function that aggregates the dataframe based on same 5-minute intervals,  
 and averages the number of steps per 5-minute interval, by dividing the  
-sum by the number of days (61).   
+sum by the number of days (**61**).   
 The *"date"* column is then dropped:
 
 
@@ -125,7 +125,7 @@ newdaysteps<-aggregate(. ~ date, data=newdata, FUN=sum)
 
 
 ```r
-ggplot(newdaysteps, aes(steps)) + geom_histogram(binwidth = 500, colour="white") + ggtitle("With Inputed Missing Values")
+ggplot(newdaysteps,aes(steps))+geom_histogram(binwidth=500,colour="white")+ggtitle("With Inputed Missing Values")
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
@@ -141,7 +141,52 @@ The mean is 1.0581 &times; 10<sup>4</sup>, and the median is 1.0395 &times; 10<s
 
 ## Part 5: Activity Patterns: Weekdays vs Weekends
 
+This final part of the assignment is to determine diferences in the 5-minute intervals average number of steps between weekdays and weekends.   
+
+To do this the following sequence is applied to the data:  
+
+1- Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day, and save in a new dataset ("*newdata2*")
 
 ```r
 newdata2<-transform(newdata, weekend=as.POSIXlt(date, format='%Y/%m/%d')$wday %in% c(0, 6))
 ```
+
+2- The data is subsetted into two datasets, one for "*weekdays*" and one for "*weekends*"
+
+```r
+weekdays<-subset(newdata2, weekend==FALSE)
+weekdays$date<-NULL
+weekends<-subset(newdata2, weekend==TRUE)
+weekends$date<-NULL
+```
+
+3- For each of the two new datasets, the  number of steps per 5-minute   
+interval is determined by the aggregate function that aggregates the dataframe  
+based on same 5-minute intervals, and then averaged the number of steps per  
+5-minute interval by dividing the sum by the number of days (**45** weekdays, and **16** weekend days). 
+
+```r
+weekdays<-aggregate(. ~ interval, data=weekdays, FUN=sum)
+weekends<-aggregate(. ~ interval, data=weekends, FUN=sum)
+
+weekdays$steps<-weekdays$steps/45
+weekends$steps<-weekends$steps/16
+```
+
+
+4- We add a factor "*day*" indicating each row to be "*weekdays*" or "*weekends*", and combine both datasets into the "*finaldata*" dataset.  
+
+```r
+weekdays$day<-"weekdays"
+weekends$day<-"weekends"
+
+finaldata<-rbind(weekdays,weekends)
+```
+
+5- A panel plot is made containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).   
+
+```r
+print(xyplot(steps ~ interval | day, data =finaldata, layout=c(1,2), type="l"))
+```
+
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15.png) 
