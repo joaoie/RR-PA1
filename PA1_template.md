@@ -180,7 +180,7 @@ weekends$steps<-weekends$steps/16
 weekdays$day<-"weekdays"
 weekends$day<-"weekends"
 
-finaldata<-rbind(weekdays,weekends)
+finaldata<-rbind(weekdays, weekends)
 ```
 
 5- A panel plot is made containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).   
